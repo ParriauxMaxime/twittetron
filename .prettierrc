@@ -1,0 +1,13 @@
+{
+  "importOrder": [
+    "^react(.*)$",
+    "^@heroicons",
+    "^pages/(.*)$",
+    "^components/(.*)$",
+    "^[./]+([a-zA-Z0-9/]+)(?!css)$",
+    "^[./]+",
+    "^(.*)css$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
