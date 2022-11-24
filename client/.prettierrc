@@ -2,6 +2,9 @@
   "importOrder": [
     "^react(.*)$",
     "^@heroicons",
+    "^models/(.*)$",
+    "^api/(.*)$",
+    "^hooks/(.*)$",
     "^pages/(.*)$",
     "^components/(.*)$",
     "^[./]+([a-zA-Z0-9/]+)(?!css)$",

@@ -1,0 +1,8 @@
+{
+  "importOrder": [
+    "^express$",
+    "^[./]+"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
