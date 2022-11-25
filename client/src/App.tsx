@@ -1,3 +1,5 @@
+import { AppProvider } from "contexts/AppContext";
+
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
@@ -11,7 +13,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AppProvider>
+      <RouterProvider router={router} />
+    </AppProvider>
+  );
 }
 
 export default App;

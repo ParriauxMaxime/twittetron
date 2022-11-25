@@ -2,7 +2,7 @@
   "importOrder": [
     "^react(.*)$",
     "^@heroicons",
-    "^models/(.*)$",
+    "^core/(.*)$",
     "^api/(.*)$",
     "^hooks/(.*)$",
     "^pages/(.*)$",

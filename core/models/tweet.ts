@@ -3,7 +3,8 @@ export interface Tweet {
   createdAt: string,
   text: string;
   user?: {
-    name: string
+    name: string,
+    screen_name: string,
     profile_image_url: string,
   }
 }

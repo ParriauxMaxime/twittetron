@@ -1,8 +1,22 @@
 import Twitter from "twitter";
 
+const { CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET } =
+  process.env;
+
+const envNotSet = [
+  "CONSUMER_KEY",
+  "CONSUMER_SECRET",
+  "ACCESS_TOKEN_KEY",
+  "ACCESS_TOKEN_SECRET",
+].filter((env) => !process.env[env]);
+
+if (envNotSet.length) {
+  throw new Error(`Env variable not set : ${envNotSet.join(",")}`);
+}
+
 export const client = new Twitter({
-  consumer_key: "wGvstC7IYmO1KX7JT6ttBPEJ9",
-  consumer_secret: "5PQpUzWUD9CoodpAYtr4H9L81XDHeOjCIkhclwj4fK81M3XUuO",
-  access_token_key: "979706012918829056-mMTUdRtHBX8yRoy98W49fiHSjTwSlqd",
-  access_token_secret: "1Pa6z4IRLPk1uirSn6p4zh6392aHR7eHqRMSfkOCfuMTO",
+  consumer_key: CONSUMER_KEY as string,
+  consumer_secret: CONSUMER_SECRET as string,
+  access_token_key: ACCESS_TOKEN_KEY as string,
+  access_token_secret: ACCESS_TOKEN_SECRET as string,
 });

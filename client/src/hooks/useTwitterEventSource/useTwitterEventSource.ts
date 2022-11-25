@@ -1,32 +1,28 @@
-import { Tweet } from "core/models/tweet";
-
 import { useEffect, useRef, useState } from "react";
 
-export function useTwitterEventSource(
-  track: string,
-  onData: (data: Tweet) => void,
-  onError: (error: unknown) => void
-) {
+import { Tweet } from "core/models/tweet";
+
+export function useTwitterEventSource(track: string) {
+  const [tweets, setTweets] = useState<Tweet[]>([]);
   const [run, setRun] = useState(false);
   const onStop = useRef<CallableFunction>();
 
   useEffect(() => {
     if (run) {
       const source = new EventSource(`http://localhost:5000/track/${track}`);
-      console.info("tmp");
       source.addEventListener(
         "message",
-        function (e) {
+        (e) => {
           console.log("message", e.data);
-          onData(JSON.parse(e.data));
+          const tweet = JSON.parse(e.data);
+          setTweets((currentTweets) => [tweet, ...currentTweets].slice(0, 40));
         },
         false
       );
 
       source.addEventListener(
         "open",
-        function (e) {
-          console.log("connected", e);
+        () => {
           onStop.current = source.close.bind(source);
         },
         false
@@ -34,11 +30,9 @@ export function useTwitterEventSource(
 
       source.addEventListener(
         "error",
-        function (e) {
-          console.log("error", e);
-          onError(e);
+        (error) => {
+          console.error("error", error);
           if (onStop.current) onStop.current();
-          // error occurred
         },
         false
       );
@@ -47,7 +41,7 @@ export function useTwitterEventSource(
     return () => {
       if (onStop.current) onStop.current();
     };
-  }, [track, onData, onError, run]);
+  }, [track, run]);
 
   return {
     start: () => setRun(true),
@@ -56,5 +50,6 @@ export function useTwitterEventSource(
       if (onStop.current) onStop.current();
       setRun(false);
     },
+    tweets,
   };
 }
