@@ -1,7 +1,6 @@
 {
   "importOrder": [
     "^react(.*)$",
-    "^@heroicons",
     "^core/(.*)$",
     "^api/(.*)$",
     "^hooks/(.*)$",

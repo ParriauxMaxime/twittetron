@@ -6,11 +6,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export default function Input({ id, label, value, onChange }: InputProps) {
   return (
-    <div className="flex flex-col">
-      <label htmlFor={label}>{label}</label>
+    <div className="flex my-1">
+      <label className="prose dark:prose-invert w-12" htmlFor={label}>
+        {label}
+      </label>
       <input
         {...{ id, value, onChange }}
-        className="border rounded outline-none"
+        className="border rounded outline-none px-1"
       ></input>
     </div>
   );

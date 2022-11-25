@@ -25,8 +25,8 @@ interface IAppState {
 }
 
 const initialState: IAppState = {
-  track1: "",
-  track2: "",
+  track1: "macron",
+  track2: "trump",
   run: false,
 };
 
@@ -38,6 +38,8 @@ interface IAppContext {
   reset: () => void;
   tweets1: Tweet[];
   tweets2: Tweet[];
+  received1: Date[];
+  received2: Date[];
 }
 
 const AppContext = createContext<IAppContext>({
@@ -56,6 +58,8 @@ const AppContext = createContext<IAppContext>({
   },
   tweets1: [],
   tweets2: [],
+  received1: [],
+  received2: [],
 });
 
 const AppReducer = (state: IAppState, action: Action) => {
@@ -79,12 +83,16 @@ export const AppProvider = ({ children }: { children: JSX.Element }) => {
   const {
     start: start1,
     stop: stop1,
+    reset: reset1,
     tweets: tweets1,
+    received: received1,
   } = useTwitterEventSource(state.track1);
   const {
     start: start2,
     stop: stop2,
+    reset: reset2,
     tweets: tweets2,
+    received: received2,
   } = useTwitterEventSource(state.track2);
 
   const setTrack = (key: string, value: string) => {
@@ -117,6 +125,9 @@ export const AppProvider = ({ children }: { children: JSX.Element }) => {
       stop();
     }
 
+    reset1();
+    reset2();
+
     dispatch({
       type: ActionType.RESET,
     });
@@ -132,6 +143,8 @@ export const AppProvider = ({ children }: { children: JSX.Element }) => {
         reset,
         tweets1,
         tweets2,
+        received1,
+        received2,
       }}
     >
       {children}

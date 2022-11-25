@@ -5,6 +5,7 @@ import { Tweet } from "core/models/tweet";
 export function useTwitterEventSource(track: string) {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const [run, setRun] = useState(false);
+  const [received, setReceived] = useState<Date[]>([]);
   const onStop = useRef<CallableFunction>();
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export function useTwitterEventSource(track: string) {
           console.log("message", e.data);
           const tweet = JSON.parse(e.data);
           setTweets((currentTweets) => [tweet, ...currentTweets].slice(0, 40));
+          setReceived((currentReceived) => [...currentReceived, new Date()]);
         },
         false
       );
@@ -50,6 +52,11 @@ export function useTwitterEventSource(track: string) {
       if (onStop.current) onStop.current();
       setRun(false);
     },
+    reset: () => {
+      setReceived([]);
+      setTweets([]);
+    },
     tweets,
+    received,
   };
 }

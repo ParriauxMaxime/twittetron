@@ -31,23 +31,13 @@ export default function Controls() {
         />
       </div>
       <div className="md:flex justify-around mt-2">
-        <Button
-          disabled={run || !track1 || !track2}
-          className="border bg-blue-700 w-24 rounded"
-          onClick={start}
-        >
+        <Button disabled={run || !track1 || !track2} onClick={start}>
           Start
         </Button>
-        <Button
-          disabled={!run}
-          className="border bg-blue-700 w-24 rounded"
-          onClick={stop}
-        >
+        <Button disabled={!run} onClick={stop}>
           Stop
         </Button>
-        <Button className="border bg-blue-700 w-24 rounded" onClick={reset}>
-          Reset
-        </Button>
+        <Button onClick={reset}>Reset</Button>
       </div>
     </div>
   );

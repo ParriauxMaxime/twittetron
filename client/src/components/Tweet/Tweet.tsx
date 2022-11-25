@@ -2,6 +2,10 @@ import React, { AnchorHTMLAttributes } from "react";
 
 import { Tweet as TweetModel } from "core/models/tweet";
 
+import Favorite from "components/Counters/Favorite/Favorite";
+import Reply from "components/Counters/Reply/Reply";
+import Retweet from "components/Counters/Retweet/Retweet";
+
 function Link({
   to,
   children,
@@ -27,19 +31,19 @@ export function Tweet({ tweet }: { tweet: TweetModel }) {
       <div className="w-[48px] mt-1">
         <Link to={tweet.user?.screen_name}>
           <img
-            className="max-w-[48px] rounded-full overflow-hidden prose"
+            className="max-w-[48px] rounded-full overflow-hidden prose dark:prose-invert"
             src={tweet.user?.profile_image_url}
             alt={tweet.user?.name}
           ></img>
         </Link>
       </div>
-      <div className="flex flex-col prose ml-2">
-        <div className="flex">
+      <div className="flex flex-col prose dark:prose-invert ml-2 overflow-hidden">
+        <div className="flex overflow-ellipsis">
           <Link
             className="no-underline hover:underline"
             to={tweet.user?.screen_name}
           >
-            <span className="font-bold mr-2 whitespace-nowrap">
+            <span className="font-bold mr-2 max-w-{50%} whitespace-nowrap">
               {tweet.user?.name}
             </span>
           </Link>
@@ -49,7 +53,12 @@ export function Tweet({ tweet }: { tweet: TweetModel }) {
             </span>
           </Link>
         </div>
-        <div className="prose-sm">{tweet.text}</div>
+        <div className="prose-sm dark:prose-invert">{tweet.text}</div>
+        <div className="flex">
+          <Reply count={tweet.reply_count} />
+          <Retweet count={tweet.retweet_count} />
+          <Favorite count={tweet.favorite_count} />
+        </div>
       </div>
     </div>
   );

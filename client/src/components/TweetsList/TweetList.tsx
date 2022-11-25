@@ -2,18 +2,27 @@ import { Tweet as TweetModel } from "core/models/tweet";
 
 import { Tweet } from "components/Tweet/Tweet";
 
-export default function TweetList({ tweets }: { tweets: TweetModel[] }) {
-  // const tweets = localStorage.getItem("tmp")
-  //   ? JSON.parse(localStorage.getItem("tmp") as string)
-  //   : [];
+export default function Feed({
+  tweets,
+  track,
+}: {
+  tweets: TweetModel[];
+  track: string;
+}) {
+  if (!tweets.length) {
+    return null;
+  }
 
   return (
-    <div>
-      <div className="flex border flex-col mx-2 max-h-[50vh] overflow-auto">
+    <>
+      <div className="mb-2 md:hidden prose prose-sm dark:prose-invert">
+        {track}
+      </div>
+      <div className="flex border flex-col max-h-[20vh] md:w-[50%] md:max-h-[50vh] overflow-auto mx-[-0.5rem] md:mx-2">
         {tweets.map((tweet: TweetModel) => (
           <Tweet key={tweet.id} tweet={tweet}></Tweet>
         ))}
       </div>
-    </div>
+    </>
   );
 }
