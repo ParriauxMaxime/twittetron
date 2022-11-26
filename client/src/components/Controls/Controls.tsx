@@ -7,8 +7,8 @@ import Input from "components/Input/Input";
 
 export default function Controls() {
   const {
-    state: { track1, track2, run },
-    setTrack,
+    state: { tracks, run },
+    setTracks,
     start,
     stop,
     reset,
@@ -17,21 +17,27 @@ export default function Controls() {
   return (
     <div className="mb-4">
       <div className="md:flex justify-around">
-        <Input
-          id={"track1"}
-          label={"track1"}
-          value={track1}
-          onChange={(event) => setTrack("track1", event.target.value)}
-        />
-        <Input
-          id={"track2"}
-          label={"track2"}
-          value={track2}
-          onChange={(event) => setTrack("track2", event.target.value)}
-        />
+        {tracks.map((track: string, index: number) => (
+          <Input
+            id={"track" + (index + 1)}
+            key={"track" + (index + 1)}
+            label={"track" + (index + 1)}
+            value={track}
+            disabled={run}
+            onChange={(event) => {
+              const newTracks = [...tracks];
+              newTracks[index] = event.target.value;
+
+              setTracks(newTracks);
+            }}
+          />
+        ))}
       </div>
       <div className="md:flex justify-around mt-2">
-        <Button disabled={run || !track1 || !track2} onClick={start}>
+        <Button
+          disabled={run || tracks.some((track) => !track)}
+          onClick={start}
+        >
           Start
         </Button>
         <Button disabled={!run} onClick={stop}>

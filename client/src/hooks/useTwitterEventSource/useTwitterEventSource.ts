@@ -1,23 +1,33 @@
+import { Tweet } from "models/tweet";
+
 import { useEffect, useRef, useState } from "react";
 
-import { Tweet } from "core/models/tweet";
+const URL = "http://localhost:5000/track";
 
 export function useTwitterEventSource(track: string) {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const [run, setRun] = useState(false);
-  const [received, setReceived] = useState<Date[]>([]);
+  const [tweetDates, setTweetDates] = useState<Date[]>([]);
   const onStop = useRef<CallableFunction>();
+  const feedRef = useRef<Tweet[]>([]);
+  const dateRef = useRef<Date[]>([]);
 
   useEffect(() => {
     if (run) {
-      const source = new EventSource(`http://localhost:5000/track/${track}`);
+      const source = new EventSource(`${URL}/${track}`);
       source.addEventListener(
         "message",
         (e) => {
-          console.log("message", e.data);
           const tweet = JSON.parse(e.data);
-          setTweets((currentTweets) => [tweet, ...currentTweets].slice(0, 40));
-          setReceived((currentReceived) => [...currentReceived, new Date()]);
+          if (!feedRef.current.find((t) => t.id === tweet.id)) {
+            setTweets((currentTweets) =>
+              [tweet, ...currentTweets].slice(0, 40)
+            );
+            setTweetDates((currentTweetDates) => [
+              ...currentTweetDates,
+              new Date(),
+            ]);
+          }
         },
         false
       );
@@ -32,8 +42,7 @@ export function useTwitterEventSource(track: string) {
 
       source.addEventListener(
         "error",
-        (error) => {
-          console.error("error", error);
+        () => {
           if (onStop.current) onStop.current();
         },
         false
@@ -48,15 +57,16 @@ export function useTwitterEventSource(track: string) {
   return {
     start: () => setRun(true),
     stop: () => {
-      console.info("onStop");
       if (onStop.current) onStop.current();
       setRun(false);
     },
     reset: () => {
-      setReceived([]);
+      dateRef.current = [];
+      feedRef.current = [];
+      setTweetDates([]);
       setTweets([]);
     },
     tweets,
-    received,
+    tweetDates,
   };
 }

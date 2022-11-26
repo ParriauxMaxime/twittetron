@@ -1,6 +1,6 @@
-import React, { AnchorHTMLAttributes } from "react";
+import { Tweet as TweetModel } from "models/tweet";
 
-import { Tweet as TweetModel } from "core/models/tweet";
+import React, { AnchorHTMLAttributes } from "react";
 
 import Favorite from "components/Counters/Favorite/Favorite";
 import Reply from "components/Counters/Reply/Reply";

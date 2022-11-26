@@ -1,8 +1,6 @@
-import { type } from "os";
+import { Tweet } from "models/tweet";
 
 import { createContext, useContext, useReducer } from "react";
-
-import { Tweet } from "core/models/tweet";
 
 import { useTwitterEventSource } from "hooks/useTwitterEventSource/useTwitterEventSource";
 
@@ -15,36 +13,34 @@ enum ActionType {
 
 interface Action {
   type: ActionType;
-  payload?: any;
+  payload?: { value: string[] };
 }
 
 interface IAppState {
-  track1: string;
-  track2: string;
+  tracks: string[];
   run: boolean;
 }
 
 const initialState: IAppState = {
-  track1: "macron",
-  track2: "trump",
+  tracks: ["macron", "trump"],
   run: false,
 };
 
 interface IAppContext {
   state: IAppState;
-  setTrack: (key: string, value: string) => void;
+  feeds: Tweet[][];
+  feedDates: Date[][];
+  setTracks: (value: string[]) => void;
   start: () => void;
   stop: () => void;
   reset: () => void;
-  tweets1: Tweet[];
-  tweets2: Tweet[];
-  received1: Date[];
-  received2: Date[];
 }
 
 const AppContext = createContext<IAppContext>({
   state: initialState,
-  setTrack: () => {
+  feeds: [[], []],
+  feedDates: [[], []],
+  setTracks: () => {
     return;
   },
   start: () => {
@@ -56,16 +52,15 @@ const AppContext = createContext<IAppContext>({
   reset: () => {
     return;
   },
-  tweets1: [],
-  tweets2: [],
-  received1: [],
-  received2: [],
 });
 
 const AppReducer = (state: IAppState, action: Action) => {
   switch (action.type) {
     case ActionType.SET_TRACK:
-      return { ...state, [action.payload.key]: action.payload.value };
+      return {
+        ...state,
+        tracks: (action.payload as { value: string[] }).value,
+      };
     case ActionType.START:
       return { ...state, run: true };
     case ActionType.STOP:
@@ -80,54 +75,36 @@ const AppReducer = (state: IAppState, action: Action) => {
 
 export const AppProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(AppReducer, initialState);
-  const {
-    start: start1,
-    stop: stop1,
-    reset: reset1,
-    tweets: tweets1,
-    received: received1,
-  } = useTwitterEventSource(state.track1);
-  const {
-    start: start2,
-    stop: stop2,
-    reset: reset2,
-    tweets: tweets2,
-    received: received2,
-  } = useTwitterEventSource(state.track2);
+  const trackers = state.tracks.map(useTwitterEventSource);
 
-  const setTrack = (key: string, value: string) => {
+  const setTracks = (value: string[]) => {
     dispatch({
       type: ActionType.SET_TRACK,
       payload: {
-        key,
         value,
       },
     });
   };
+
   const start = () => {
+    trackers.forEach((tracker) => tracker.start());
     dispatch({
       type: ActionType.START,
     });
-    start1();
-    start2();
   };
 
   const stop = () => {
+    trackers.forEach((tracker) => tracker.stop());
     dispatch({
       type: ActionType.STOP,
     });
-    stop1();
-    stop2();
   };
 
   const reset = () => {
     if (state.run) {
       stop();
     }
-
-    reset1();
-    reset2();
-
+    trackers.forEach((tracker) => tracker.reset());
     dispatch({
       type: ActionType.RESET,
     });
@@ -137,14 +114,12 @@ export const AppProvider = ({ children }: { children: JSX.Element }) => {
     <AppContext.Provider
       value={{
         state,
-        setTrack,
+        setTracks,
         start,
         stop,
         reset,
-        tweets1,
-        tweets2,
-        received1,
-        received2,
+        feeds: trackers.map((tracker) => tracker.tweets),
+        feedDates: trackers.map((tracker) => tracker.tweetDates),
       }}
     >
       {children}

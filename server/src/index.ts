@@ -3,7 +3,6 @@ config();
 
 import { client } from "api/twitter/twitter";
 import express from "express";
-import { Tweet } from "core/models/tweet";
 
 const port = process.env.PORT || 5000;
 const app = express();
@@ -32,18 +31,16 @@ app.get("/track/:track", (req, res) => {
   res.write("retry: 5000\n\n");
 
   client.stream("statuses/filter", { track }, (stream) => {
-    stream.on("data", (tweet: Tweet) => {
+    stream.on("data", (tweet) => {
       res.write("id: " + track + "\n");
       res.write("data: " + JSON.stringify(tweet) + "\n\n");
     });
 
     stream.on("error", (error: any) => {
-      console.error(error);
-      res.end();
       (stream as any).destroy();
-      // stream.removeAllListeners();
-      // res.send(error);
+      res.end();
     });
+
     res.on("close", () => {
       (stream as any).destroy();
     });

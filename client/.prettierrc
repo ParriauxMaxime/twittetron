@@ -1,7 +1,6 @@
 {
   "importOrder": [
     "^react(.*)$",
-    "^core/(.*)$",
     "^api/(.*)$",
     "^hooks/(.*)$",
     "^pages/(.*)$",
