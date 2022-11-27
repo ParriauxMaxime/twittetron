@@ -1,8 +1,8 @@
-import { Tweet } from "models/tweet";
-
 import { createContext, useContext, useReducer } from "react";
 
-import { useTwitterEventSource } from "hooks/useTwitterEventSource/useTwitterEventSource";
+import { Tweet } from "models/tweet";
+
+import { useTwitterEventSource } from "hooks/useTwitterEventSource";
 
 enum ActionType {
   START,
@@ -22,14 +22,14 @@ interface IAppState {
 }
 
 const initialState: IAppState = {
-  tracks: ["macron", "trump"],
+  tracks: ["piano", "guitar"],
   run: false,
 };
 
 interface IAppContext {
   state: IAppState;
   feeds: Tweet[][];
-  feedDates: Date[][];
+  velocities: Record<string, number>[];
   setTracks: (value: string[]) => void;
   start: () => void;
   stop: () => void;
@@ -38,8 +38,8 @@ interface IAppContext {
 
 const AppContext = createContext<IAppContext>({
   state: initialState,
+  velocities: [{}, {}],
   feeds: [[], []],
-  feedDates: [[], []],
   setTracks: () => {
     return;
   },
@@ -119,7 +119,7 @@ export const AppProvider = ({ children }: { children: JSX.Element }) => {
         stop,
         reset,
         feeds: trackers.map((tracker) => tracker.tweets),
-        feedDates: trackers.map((tracker) => tracker.tweetDates),
+        velocities: trackers.map((tracker) => tracker.velocity),
       }}
     >
       {children}

@@ -1,19 +1,29 @@
-import { Tweet } from "models/tweet";
-
 import { useEffect, useRef, useState } from "react";
+
+import { Tweet } from "models/tweet";
 
 const URL = "http://localhost:5000/track";
 
 export function useTwitterEventSource(track: string) {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const [run, setRun] = useState(false);
-  const [tweetDates, setTweetDates] = useState<Date[]>([]);
   const onStop = useRef<CallableFunction>();
   const feedRef = useRef<Tweet[]>([]);
-  const dateRef = useRef<Date[]>([]);
+  const velocityRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
     if (run) {
+      let i = 0;
+      interval = setInterval(() => {
+        const now = Date.now();
+        const second = now - (now % 1000);
+        velocityRef.current[second] = i;
+        i = 0;
+        if (second - 60000 in velocityRef.current) {
+          delete velocityRef.current[second - 60000];
+        }
+      }, 1000);
       const source = new EventSource(`${URL}/${track}`);
       source.addEventListener(
         "message",
@@ -23,10 +33,7 @@ export function useTwitterEventSource(track: string) {
             setTweets((currentTweets) =>
               [tweet, ...currentTweets].slice(0, 40)
             );
-            setTweetDates((currentTweetDates) => [
-              ...currentTweetDates,
-              new Date(),
-            ]);
+            i++;
           }
         },
         false
@@ -51,6 +58,7 @@ export function useTwitterEventSource(track: string) {
 
     return () => {
       if (onStop.current) onStop.current();
+      clearInterval(interval);
     };
   }, [track, run]);
 
@@ -61,12 +69,10 @@ export function useTwitterEventSource(track: string) {
       setRun(false);
     },
     reset: () => {
-      dateRef.current = [];
-      feedRef.current = [];
-      setTweetDates([]);
+      velocityRef.current = {};
       setTweets([]);
     },
     tweets,
-    tweetDates,
+    velocity: velocityRef.current,
   };
 }

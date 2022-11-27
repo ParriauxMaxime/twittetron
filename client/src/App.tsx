@@ -1,5 +1,3 @@
-import { AppProvider } from "contexts/AppContext";
-
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 

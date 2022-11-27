@@ -1,10 +1,10 @@
-import { Tweet as TweetModel } from "models/tweet";
-
 import React, { AnchorHTMLAttributes } from "react";
 
-import Favorite from "components/Counters/Favorite/Favorite";
-import Reply from "components/Counters/Reply/Reply";
-import Retweet from "components/Counters/Retweet/Retweet";
+import { Tweet as TweetModel } from "models/tweet";
+
+import Favorite from "./Counters/Favorite";
+import Reply from "./Counters/Reply";
+import Retweet from "./Counters/Retweet";
 
 function Link({
   to,

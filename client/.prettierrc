@@ -1,9 +1,10 @@
 {
   "importOrder": [
     "^react(.*)$",
-    "^api/(.*)$",
+    "^routes/(.*)$",
+    "^models/(.*)$",
+    "^contexts/(.*)$",
     "^hooks/(.*)$",
-    "^pages/(.*)$",
     "^components/(.*)$",
     "^[./]+([a-zA-Z0-9/]+)(?!css)$",
     "^[./]+",

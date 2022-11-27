@@ -1,15 +1,14 @@
-import { useFeed } from "hooks/useFeed/useFeed";
+import { Tweet as TweetModel } from "models/tweet";
 
-import { Tweet } from "components/Tweet/Tweet";
-
-import { Tweet as TweetModel } from "../../models/tweet";
+import { Tweet } from "./Tweet";
+import { useFeed } from "./useFeed";
 
 export default function Feed({ trackIndex }: { trackIndex: number }) {
   const { feed, track } = useFeed(trackIndex);
 
   return (
     <>
-      <div className="mb-2 md:hidden prose prose-sm dark:prose-invert">
+      <div className="md:hidden text-center prose font-bold dark:prose-invert">
         {track}
       </div>
       <div

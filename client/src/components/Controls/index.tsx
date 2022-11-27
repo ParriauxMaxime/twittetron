@@ -1,9 +1,9 @@
+import React, { ChangeEvent } from "react";
+
 import { useAppContext } from "contexts/AppContext";
 
-import React from "react";
-
-import Button from "components/Button/Button";
-import Input from "components/Input/Input";
+import Button from "./Button";
+import Input from "./Input";
 
 export default function Controls() {
   const {
@@ -14,8 +14,16 @@ export default function Controls() {
     reset,
   } = useAppContext();
 
+  const handleChange =
+    (trackIndex: number) => (event: ChangeEvent<HTMLInputElement>) => {
+      const newTracks = [...tracks];
+      newTracks[trackIndex] = event.target.value;
+
+      setTracks(newTracks);
+    };
+
   return (
-    <div className="mb-4">
+    <div className="mb-4 md:my-8">
       <div className="md:flex justify-around">
         {tracks.map((track: string, index: number) => (
           <Input
@@ -24,12 +32,7 @@ export default function Controls() {
             label={"track" + (index + 1)}
             value={track}
             disabled={run}
-            onChange={(event) => {
-              const newTracks = [...tracks];
-              newTracks[index] = event.target.value;
-
-              setTracks(newTracks);
-            }}
+            onChange={handleChange(index)}
           />
         ))}
       </div>
