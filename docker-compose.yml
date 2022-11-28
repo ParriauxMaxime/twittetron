@@ -2,19 +2,17 @@ version: '3.7'
 
 services:
   api:
-    container_name: twittertron-server
+    container_name: twittetron-server
     build:
       context: ./server
     ports:
       - 5000:5000
     command: npm start
-    environment:
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     networks:
       - webnet
 
   client:
-    container_name: twittertron-client
+    container_name: twittetron-client
     build:
       context: ./client
     ports:
@@ -22,6 +20,7 @@ services:
     command: npm run serve
     networks:
       - webnet
+
 networks:
   webnet:
     driver: bridge

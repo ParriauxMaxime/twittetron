@@ -5,36 +5,43 @@ import { Tweet } from "models/tweet";
 const URL = "http://localhost:5000/track";
 
 export function useTwitterEventSource(track: string) {
-  const [tweets, setTweets] = useState<Tweet[]>([]);
+  const tweetStore = useRef<Record<string, Tweet>>({});
+  const [tweetList, setTweetList] = useState<string[]>([]);
   const [run, setRun] = useState(false);
   const onStop = useRef<CallableFunction>();
-  const feedRef = useRef<Tweet[]>([]);
-  const velocityRef = useRef<Record<string, number>>({});
+  const [velocity, setVelocity] = useState<Record<string, number>>({});
+
+  const stop = () => {
+    if (onStop.current) onStop.current();
+    setRun(false);
+  };
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
+    let tweetCountInPeriod = 0;
+
+    const interval = setInterval(() => {
+      const now = +Date.now();
+      const second = +now - (+now % 1000);
+      setVelocity((currentVelocity) => ({
+        ...currentVelocity,
+        [second]: tweetCountInPeriod,
+      }));
+      tweetCountInPeriod = 0;
+    }, 1000);
+
     if (run) {
-      let i = 0;
-      interval = setInterval(() => {
-        const now = Date.now();
-        const second = now - (now % 1000);
-        velocityRef.current[second] = i;
-        i = 0;
-        if (second - 60000 in velocityRef.current) {
-          delete velocityRef.current[second - 60000];
-        }
-      }, 1000);
       const source = new EventSource(`${URL}/${track}`);
       source.addEventListener(
         "message",
         (e) => {
           const tweet = JSON.parse(e.data);
-          if (!feedRef.current.find((t) => t.id === tweet.id)) {
-            setTweets((currentTweets) =>
-              [tweet, ...currentTweets].slice(0, 40)
-            );
-            i++;
-          }
+          tweetStore.current[tweet.id] = tweet;
+
+          setTweetList((currentTweetList) =>
+            // There is no guarantee than a tweet will be streamed only once
+            [...new Set([tweet.id, ...currentTweetList])].slice(0, 40)
+          );
+          tweetCountInPeriod++;
         },
         false
       );
@@ -47,13 +54,7 @@ export function useTwitterEventSource(track: string) {
         false
       );
 
-      source.addEventListener(
-        "error",
-        () => {
-          if (onStop.current) onStop.current();
-        },
-        false
-      );
+      source.addEventListener("error", stop, false);
     }
 
     return () => {
@@ -64,15 +65,12 @@ export function useTwitterEventSource(track: string) {
 
   return {
     start: () => setRun(true),
-    stop: () => {
-      if (onStop.current) onStop.current();
-      setRun(false);
-    },
+    stop,
     reset: () => {
-      velocityRef.current = {};
-      setTweets([]);
+      setVelocity({});
+      setTweetList([]);
     },
-    tweets,
-    velocity: velocityRef.current,
+    tweets: tweetList.map((tweetId: string) => tweetStore.current[tweetId]),
+    velocity,
   };
 }

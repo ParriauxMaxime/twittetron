@@ -1,7 +1,7 @@
 import Twitter from "twitter";
 
 const { CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET } =
-  process.env;
+  process.env as Record<string, string>;
 
 const envNotSet = [
   "CONSUMER_KEY",
@@ -15,8 +15,8 @@ if (envNotSet.length) {
 }
 
 export const client = new Twitter({
-  consumer_key: CONSUMER_KEY as string,
-  consumer_secret: CONSUMER_SECRET as string,
-  access_token_key: ACCESS_TOKEN_KEY as string,
-  access_token_secret: ACCESS_TOKEN_SECRET as string,
+  consumer_key: CONSUMER_KEY,
+  consumer_secret: CONSUMER_SECRET,
+  access_token_key: ACCESS_TOKEN_KEY,
+  access_token_secret: ACCESS_TOKEN_SECRET,
 });

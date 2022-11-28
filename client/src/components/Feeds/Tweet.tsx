@@ -1,29 +1,11 @@
-import React, { AnchorHTMLAttributes } from "react";
+import React from "react";
 
 import { Tweet as TweetModel } from "models/tweet";
 
 import Favorite from "./Counters/Favorite";
 import Reply from "./Counters/Reply";
 import Retweet from "./Counters/Retweet";
-
-function Link({
-  to,
-  children,
-  ...props
-}: {
-  to?: string;
-} & AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return (
-    <a
-      className="no-underline"
-      target="_blank"
-      href={`https://twitter.com/${to}`}
-      {...props}
-    >
-      {children}
-    </a>
-  );
-}
+import { Link } from "./Link";
 
 export function Tweet({ tweet }: { tweet: TweetModel }) {
   return (

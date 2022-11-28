@@ -1,14 +1,19 @@
 import { config } from "dotenv";
 config();
 
-import { client } from "api/twitter/twitter";
 import express from "express";
+import { client } from "api/twitter/twitter";
+import { EventEmitter } from "events";
+
+interface DestroyableEventEmitter extends EventEmitter {
+  destroy(): void;
+}
 
 const port = process.env.PORT || 5000;
 const app = express();
 
 // Allow CORS
-app.use((req, res, next) => {
+app.use((_, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
@@ -31,18 +36,24 @@ app.get("/track/:track", (req, res) => {
   res.write("retry: 5000\n\n");
 
   client.stream("statuses/filter", { track }, (stream) => {
-    stream.on("data", (tweet) => {
+    // Believe it or not, the forked package actually expose a destroy method
+    // which is not implemented by  EventEmitter
+    //https://github.com/jdub/node-twitter#streaming-api-stable
+    const destroyableStream = stream as DestroyableEventEmitter;
+
+    destroyableStream.on("data", (tweet) => {
       res.write("id: " + track + "\n");
       res.write("data: " + JSON.stringify(tweet) + "\n\n");
     });
 
-    stream.on("error", (error: any) => {
-      (stream as any).destroy();
+    destroyableStream.on("error", (error) => {
+      console.error(error);
+      destroyableStream.destroy();
       res.end();
     });
 
-    res.on("close", () => {
-      (stream as any).destroy();
+    res.on(`close`, () => {
+      destroyableStream.destroy();
     });
   });
 });

@@ -13,7 +13,7 @@ export default function Feed({ trackIndex }: { trackIndex: number }) {
       </div>
       <div
         style={{ visibility: feed.length ? "visible" : "hidden" }}
-        className="flex flex-col border max-h-[15vh] md:w-[50%] md:max-h-[50vh] overflow-auto mx-[-0.5rem] md:mx-2"
+        className="flex flex-col border min-h-[15vh] max-h-[15vh] md:w-[50%] md:max-h-[45vh] overflow-auto mx-[-0.5rem] md:mx-2"
       >
         {feed.map((tweet: TweetModel) => (
           <Tweet key={tweet.id} tweet={tweet}></Tweet>

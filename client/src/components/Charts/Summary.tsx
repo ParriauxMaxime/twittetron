@@ -3,7 +3,7 @@ import { AxisOptions, Chart, UserSerie } from "react-charts";
 
 import { useAppContext } from "contexts/AppContext";
 
-type ISummaryDatum = {
+type VelocityDatum = {
   date: number;
   count: number;
 };
@@ -14,22 +14,25 @@ export default function Summary() {
     velocities,
   } = useAppContext();
 
-  const data: UserSerie<ISummaryDatum>[] = velocities.map(
-    (velocity, index) => ({
-      label: tracks[index] || `tracks${index + 1}`,
-      data: Object.entries(velocity).map(([key, value]) => ({
-        date: parseInt(key),
-        count: value,
+  const data: UserSerie<VelocityDatum>[] = useMemo(
+    () =>
+      velocities.map((velocity, index) => ({
+        label: tracks[index] || `tracks${index + 1}`,
+        data: Object.entries(velocity).map(([key, value]) => ({
+          date: parseInt(key),
+          count: value,
+        })),
       })),
-    })
+    [velocities, tracks]
   );
 
   const primaryAxis = useMemo(
-    (): AxisOptions<ISummaryDatum> => ({
-      getValue: (datum: ISummaryDatum) => +datum.date,
+    (): AxisOptions<VelocityDatum> => ({
+      getValue: (datum: VelocityDatum) => +datum.date,
       scaleType: "linear",
       min: +new Date(),
-      max: +new Date(Date.now() + 10000),
+      max: +new Date() + 10000,
+      tickCount: 5,
       formatters: {
         scale(value: number) {
           return new Date(value).toLocaleTimeString();
@@ -40,12 +43,12 @@ export default function Summary() {
   );
 
   const secondaryAxes = useMemo(
-    (): AxisOptions<ISummaryDatum>[] => [
+    (): AxisOptions<VelocityDatum>[] => [
       {
-        getValue: (datum: ISummaryDatum) => datum.count,
+        getValue: (datum: VelocityDatum) => datum.count,
         scaleType: "linear",
         hardMin: 0,
-        max: 5,
+        max: 8,
       },
     ],
     []
@@ -53,8 +56,14 @@ export default function Summary() {
 
   return (
     <>
-      <div className="my-4 prose dark:prose-invert">
+      <div className="my-4 prose max-w-full text-center dark:prose-invert">
         <h2>Velocity (tweets/second) </h2>
+      </div>
+      <div className="flex items-center prose font-bold dark:prose-invert">
+        <div className="h-4 w-6 bg-[#0f83ab] mr-2" />
+        {tracks[0]}
+        <div className="h-4 w-6 bg-[#dd9237] mr-2 ml-4" />
+        {tracks[1]}
       </div>
       <div className="h-[20vh]">
         <Chart
@@ -62,7 +71,6 @@ export default function Summary() {
             data: data,
             primaryAxis,
             secondaryAxes,
-            interactionMode: "closest",
             dark:
               window.matchMedia &&
               window.matchMedia("(prefers-color-scheme: dark)").matches,

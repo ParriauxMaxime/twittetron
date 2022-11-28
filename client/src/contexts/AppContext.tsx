@@ -22,7 +22,7 @@ interface IAppState {
 }
 
 const initialState: IAppState = {
-  tracks: ["piano", "guitar"],
+  tracks: ["", ""],
   run: false,
 };
 
